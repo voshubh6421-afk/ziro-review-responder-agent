@@ -3,48 +3,176 @@
 <html>
 <head>
     <title>Ziro Digital</title>
+
     <style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f1f5f9;
-        padding: 30px;
-    }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f1f5f9;
+            padding: 30px;
+        }
 
-    h1 {
-        color: #1e3a8a;
-    }
+        h1 {
+            color: #1e3a8a;
+        }
 
-    button {
-        padding: 10px 15px;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        margin-right: 8px;
-    }
+        .review-card {
+            background-color: white;
+            padding: 20px;
+            margin-top: 25px;
+            border-radius: 10px;
+            max-width: 600px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
 
-    button:first-of-type {
-        background-color: #2563eb;
-        color: white;
-    }
+        .review-card h3 {
+            color: #1e3a8a;
+        }
 
-    button:last-of-type {
-        background-color: #dc2626;
-        color: white;
-    }
-</style>
+        textarea {
+            width: 95%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-family: Arial, sans-serif;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 8px;
+            color: white;
+        }
+
+        .approve {
+            background-color: #2563eb;
+        }
+
+        .reject {
+            background-color: #dc2626;
+        }
+
+        #status {
+            font-weight: bold;
+            margin-top: 15px;
+        }
+    </style>
 </head>
+
 <body>
 
     <h1>Ziro Digital</h1>
     <h2>Google Review Responder</h2>
 
-    <p>Manage your customer reviews.</p>
-<p>Total Reviews: 4</p>
-<p>Unanswered Reviews: 2</p>
+    <p>Manage customer reviews and approve AI-generated replies.</p>
+   <p>Total Reviews: 3 | Unanswered Reviews: 3</p>
+    
+<input id="search" type="text" placeholder="Search customer or review..." oninput="filterReviews()">
 
-<p>Posted Reviews: 0</p>
-    <button>Approve Reply</button>
-    <button>Reject Reply</button>
+<select id="filter" onchange="filterReviews()">
+    <option value="all">All Reviews</option>
+    <option value="positive">Positive (4-5 stars)</option>
+    <option value="negative">Negative (1-2 stars)</option>
+    <option value="unanswered">Unanswered</option>
+</select>
+
+
+    <div class="review-card" data-name="Rahul Sharma" data-rating="5" data-status="unanswered">
+
+        <h3>Rahul Sharma ⭐⭐⭐⭐⭐</h3>
+
+        <p><strong>Customer Review:</strong></p>
+        <p>The food was delicious and the staff was very friendly!</p>
+
+        <p><strong>AI Suggested Reply:</strong></p>
+
+        <textarea id="reply" rows="4">Thank you, Rahul! We are glad you enjoyed our food and service.</textarea>
+
+        <br><br>
+
+<button class="approve" onclick="approveCard(this)">Approve Reply</button>
+<button class="reject" onclick="rejectCard(this)">Reject Reply</button>
+
+      <p class="status">Status: Draft</p>
+
+    </div>
+    
+<div class="review-card" data-name="Priya Sharma" data-rating="2" data-status="unanswered">
+    <h3>Priya Sharma ⭐⭐</h3>
+    <p><strong>Customer Review:</strong></p>
+    <p>The food was cold and service was slow.</p>
+
+    <p><strong>AI Suggested Reply:</strong></p>
+    <textarea rows="3">We are sorry about your experience. We will work to improve our service.</textarea>
+
+    <br><br>
+    <button class="approve" onclick="approveCard(this)">Approve Reply</button>
+    <button class="reject" onclick="rejectCard(this)">Reject Reply</button>
+    <p class="status">Status: Draft</p>
+</div>
+
+<div class="review-card" data-name="Aman Verma" data-rating="4" data-status="unanswered">
+    <h3>Aman Verma ⭐⭐⭐⭐</h3>
+    <p><strong>Customer Review:</strong></p>
+    <p>Good food and a pleasant atmosphere.</p>
+
+    <p><strong>AI Suggested Reply:</strong></p>
+    <textarea rows="3">Thank you for your feedback! We hope to see you again.</textarea>
+
+    <br><br>
+    <button class="approve" onclick="approveCard(this)">Approve Reply</button>
+    <button class="reject" onclick="rejectCard(this)">Reject Reply</button>
+    <p class="status">Status: Draft</p>
+</div>
+
+
+    <script>
+       
+function filterReviews() {
+    const search = document.getElementById("search").value.toLowerCase();
+    const filter = document.getElementById("filter").value;
+    const cards = document.querySelectorAll(".review-card");
+
+    cards.forEach(card => {
+        const text = card.innerText.toLowerCase();
+        const name = card.dataset.name.toLowerCase();
+        const rating = Number(card.dataset.rating);
+        const status = card.dataset.status;
+
+        const matchesSearch = text.includes(search) || name.includes(search);
+        const matchesFilter =
+            filter === "all" ||
+            (filter === "positive" && rating >= 4) ||
+            (filter === "negative" && rating <= 2) ||
+            (filter === "unanswered" && status === "unanswered");
+
+        card.style.display = matchesSearch && matchesFilter ? "block" : "none";
+    });
+}
+
+function approveCard(button) {
+    const card = button.closest(".review-card");
+    const reply = card.querySelector("textarea").value.trim();
+
+    if (reply === "") {
+        alert("Please enter a reply first!");
+        return;
+    }
+
+    card.querySelector(".status").innerText = "Status: Approved (Demo)";
+    card.dataset.status = "approved";
+}
+
+function rejectCard(button) {
+    const card = button.closest(".review-card");
+
+    card.querySelector(".status").innerText = "Status: Rejected";
+    card.dataset.status = "rejected";
+}
+
+
+    </script>
 
 </body>
 </html>
